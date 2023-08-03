@@ -1,0 +1,25 @@
+#header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: #446fde;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+.headerItem {
+  height: 2rem;
+}
+#headerTitle {
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+}
+.headerGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.headerItem {
+  cursor: pointer;
+}
