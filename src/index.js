@@ -28,7 +28,6 @@ function displayMain() {
 var sidebarStatus = true;
 document.addEventListener("click", (event) => {
   if (event.target.dataset.headerItem === "burger") {
-    console.log(sidebarStatus);
     if (!sidebarStatus) {
       openNav();
       sidebarStatus = true;
