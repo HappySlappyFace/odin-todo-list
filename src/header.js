@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/no-cycle */
 import "./styles/header.css";
 import HomeIcon from "./icons/icons8-home.svg";
 import BurgerIcon from "./icons/icons8-menu.svg";

@@ -1,3 +1,8 @@
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
+/* eslint-disable no-unused-vars */
+/* eslint-disable import/named */
+/* eslint-disable import/no-cycle */
 import { createHeader } from "./header";
 import { createSidebar, closeNav, openNav } from "./sidebar";
 import { createMainContent, renderData } from "./mainContent";
@@ -10,14 +15,15 @@ const $container = document.querySelector("#container");
 function createElement(tag, idName, classNames, text) {
   const $element = document.createElement(tag);
   if (idName) $element.id = idName;
-  if (classNames)
+  if (classNames) {
     classNames.forEach((element) => {
       $element.classList.add(element);
     });
+  }
   if (text) $element.textContent = text;
   return $element;
 }
-var sidebarStatus = true;
+let sidebarStatus = true;
 function displayMain() {
   const $main = createElement("div", "main", null, null);
   $container.append($main);

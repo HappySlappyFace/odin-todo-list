@@ -1,16 +1,11 @@
+/* eslint-disable no-alert */
+/* eslint-disable import/no-cycle */
+/* eslint-disable eqeqeq */
+import { formatDistanceToNow, parseISO } from "date-fns";
 import { $container, createElement } from "./index";
-import { alerter } from "./alerts";
 import { renderElement, renderData } from "./mainContent";
-import {
-  daysToWeeks,
-  formatDistance,
-  formatDistanceStrict,
-  formatDistanceToNow,
-  parseISO,
-  quartersToYears,
-  subDays,
-} from "date-fns";
 import "./styles/modal.css";
+
 function render(type, nodeObject) {
   const target = $container.querySelector("#main");
   const $dialog = target.querySelector(".modal");
@@ -173,18 +168,18 @@ function render(type, nodeObject) {
         return;
       }
       let localData = localStorage.getItem("data");
-      localData = localData ? localData : "[]";
-      let data = JSON.parse(localData);
+      localData = localData || "[]";
+      const data = JSON.parse(localData);
 
       const id = Date.now();
-      let toInsert = {
-        id: id,
-        title: title,
-        description: description,
+      const toInsert = {
+        id,
+        title,
+        description,
         category: "todo",
-        project: project,
+        project,
         dueDate: date,
-        priority: priority,
+        priority,
       };
       // console.log(toInsert);
       data.push(toInsert);
@@ -214,8 +209,8 @@ function render(type, nodeObject) {
 
   if (type == "editTask") {
     let localData = localStorage.getItem("data");
-    localData = localData ? localData : "[]";
-    let data = JSON.parse(localData);
+    localData = localData || "[]";
+    const data = JSON.parse(localData);
     const HTMLElement = nodeObject.querySelector(".todoChildContent");
     // alerter(HTMLElement);
     const ID = nodeObject.dataset.todoId;
@@ -356,12 +351,12 @@ function render(type, nodeObject) {
       const priority = $dialogFormPriorityInput.value;
       const toInsert = {
         id: ID,
-        title: title,
+        title,
         category: object.category,
         project: object.project,
-        description: description,
+        description,
         dueDate: date,
-        priority: priority,
+        priority,
       };
       // console.log(toInsert);
       const index = data.findIndex((item) => item.id == ID);
@@ -369,10 +364,10 @@ function render(type, nodeObject) {
       const newData = JSON.stringify(data);
       localStorage.setItem("data", newData);
       // alerter(HTMLElement);
-      let ElementTitle = HTMLElement.querySelector(".todoChildTitle");
+      const ElementTitle = HTMLElement.querySelector(".todoChildTitle");
       ElementTitle.textContent = toInsert.title;
 
-      let ElementDate = HTMLElement.querySelector(".todoChildDate");
+      const ElementDate = HTMLElement.querySelector(".todoChildDate");
       const compareDate = parseISO(toInsert.dueDate) - new Date();
       if (compareDate < 0) {
         ElementDate.parentElement.parentElement.classList.add(
@@ -383,7 +378,7 @@ function render(type, nodeObject) {
         (compareDate < 0 ? "Due by " : "In ") +
         formatDistanceToNow(parseISO(toInsert.dueDate));
 
-      let ElementPriority = HTMLElement.querySelector(".todoChildPriority");
+      const ElementPriority = HTMLElement.querySelector(".todoChildPriority");
       ElementPriority.textContent = toInsert.priority;
       // alerter(HTMLElement);
       $dialog.close();

@@ -1,6 +1,8 @@
+/* eslint-disable import/no-cycle */
 import { $container, createElement } from "./index";
 import { renderData } from "./mainContent";
 import "./styles/sidebar.css";
+
 function render() {
   const $sidebar = createElement("div", "sidebar", null, null);
   const $mainCategory = createElement("div", "mainCategory", null, null);

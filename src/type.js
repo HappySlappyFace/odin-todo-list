@@ -1,4 +1,5 @@
-import { alerter } from "./alerts";
+/* eslint-disable no-underscore-dangle */
+// import { alerter } from "./alerts";
 
 class todo {
   constructor(title, description, project, category, dueDate, checklist) {
@@ -9,9 +10,11 @@ class todo {
     this.dueDate = dueDate;
     this.checklist = checklist;
   }
+
   get title() {
     return this._title;
   }
+
   set title(name) {
     if (name.length > 0) {
       this._title = name;
@@ -19,9 +22,11 @@ class todo {
     }
     alerter("Title cannot be empty");
   }
+
   get description() {
     return this._description;
   }
+
   set description(name) {
     if (name.length > 0) {
       this._description = name;
@@ -29,9 +34,11 @@ class todo {
     }
     alerter("Description cannot be empty");
   }
+
   get category() {
     return this._category;
   }
+
   set category(name) {
     if (name !== null) {
       this._category = name;
@@ -39,9 +46,11 @@ class todo {
     }
     alerter("category cannot be empty");
   }
+
   get project() {
     return this._project;
   }
+
   set project(name) {
     if (name !== null) {
       this._project = name;
@@ -49,9 +58,11 @@ class todo {
     }
     alerter("project cannot be empty");
   }
+
   get dueDate() {
     return this._dueDate;
   }
+
   set dueDate(date) {
     if (date != null) {
       this._dueDate = date;
@@ -59,9 +70,11 @@ class todo {
     }
     alerter("invalid date");
   }
+
   get checklist() {
     return this._checklist;
   }
+
   set checklist(list) {
     if (list.length > 0) {
       this._checklist = list;
@@ -69,8 +82,9 @@ class todo {
     }
     alerter("checklist empty");
   }
+
   get todoCompleted() {
-    var todoCompletedResult = true;
+    let todoCompletedResult = true;
     this.checklist.forEach((element) => {
       alerter(element.checked);
       if (element.checked !== true) {
@@ -79,12 +93,13 @@ class todo {
     });
     return todoCompletedResult;
   }
+
   appendChecklistItem(text, checked) {
-    this.checklist.push({ text: text, checked: checked });
+    this.checklist.push({ text, checked });
   }
 }
-var data = [];
-let test = new todo("title", "desc", "default", "health", "test", [
+const data = [];
+const test = new todo("title", "desc", "default", "health", "test", [
   { text: "hey", checked: true },
   { text: "test", checked: true },
 ]);

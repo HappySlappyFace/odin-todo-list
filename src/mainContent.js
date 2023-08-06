@@ -1,13 +1,8 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable eqeqeq */
+/* eslint-disable import/no-cycle */
+import { formatDistanceToNow, parseISO, subDays } from "date-fns";
 import { $container, createElement } from "./index";
-import {
-  daysToWeeks,
-  formatDistance,
-  formatDistanceStrict,
-  formatDistanceToNow,
-  parseISO,
-  quartersToYears,
-  subDays,
-} from "date-fns";
 import { alerter } from "./alerts";
 // import { data } from "./type";
 import { renderModal, renderInitialModal } from "./modal";
@@ -15,10 +10,9 @@ import { renderModal, renderInitialModal } from "./modal";
 import EditIcon from "./icons/Edit.svg";
 import DeleteIcon from "./icons/delete.svg";
 import "./styles/mainContent.css";
-import { is } from "date-fns/locale";
 
 let localData = localStorage.getItem("data");
-localData = localData ? localData : "[]";
+localData = localData || "[]";
 let data = JSON.parse(localData);
 // data.splice(0, 2);
 // alerter(data);
@@ -37,20 +31,18 @@ function renderData(filter) {
   const projects = localStorage.getItem("projects").split(",");
   if (projects.includes(filter)) {
     localData = localStorage.getItem("data");
-    localData = localData ? localData : "[]";
+    localData = localData || "[]";
     data = JSON.parse(localData);
     $containerTitle.textContent = filter;
-    data = data.filter((element) => {
-      return element.project == filter;
-    });
+    data = data.filter((element) => element.project == filter);
   } else if (filter == "all") {
     localData = localStorage.getItem("data");
-    localData = localData ? localData : "[]";
+    localData = localData || "[]";
     data = JSON.parse(localData);
     $containerTitle.textContent = "All tasks";
   } else if (filter == "today") {
     localData = localStorage.getItem("data");
-    localData = localData ? localData : "[]";
+    localData = localData || "[]";
     data = JSON.parse(localData);
     $containerTitle.textContent = "Today's tasks";
     data = data.filter((element) => {
@@ -64,7 +56,7 @@ function renderData(filter) {
     });
   } else if (filter == "next7days") {
     localData = localStorage.getItem("data");
-    localData = localData ? localData : "[]";
+    localData = localData || "[]";
     data = JSON.parse(localData);
     $containerTitle.textContent = "Next 7 days";
     data = data.filter((element) => {
@@ -78,11 +70,12 @@ function renderData(filter) {
       );
     });
   }
-  data = data.sort(function (a, b) {
-    // Turn your strings into dates, and then subtract them
-    // to get a value that is either negative, positive, or zero.
-    return new Date(a.dueDate) - new Date(b.dueDate);
-  });
+  data = data.sort(
+    (a, b) =>
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      new Date(a.dueDate) - new Date(b.dueDate)
+  );
   document.querySelector(".todo").innerHTML = "";
   data.forEach((element) => renderElement(element));
 }
@@ -176,12 +169,12 @@ function renderElement(element) {
   );
   const $todoActions = createElement("div", null, ["todoActions"], null);
   const $todoActionsButtons = ["Edit", "Delete"];
-  $todoActionsButtons.forEach((element) => {
+  $todoActionsButtons.forEach((elem) => {
     const $todoActionsButton = new Image();
-    $todoActionsButton.src = element === "Edit" ? EditIcon : DeleteIcon;
-    $todoActionsButton.alt = element;
+    $todoActionsButton.src = elem === "Edit" ? EditIcon : DeleteIcon;
+    $todoActionsButton.alt = elem;
     $todoActionsButton.classList.add("todoActionsButton");
-    $todoActionsButton.dataset.todoActionsButton = element;
+    $todoActionsButton.dataset.todoActionsButton = elem;
     $todoActions.append($todoActionsButton);
     $todoActionsButton.addEventListener("click", (event) => {
       if (event.target.dataset.todoActionsButton === "Edit") {
@@ -192,7 +185,7 @@ function renderElement(element) {
         // alerter("Edit");
       }
       if (event.target.dataset.todoActionsButton === "Delete") {
-        alerter(event.target.parentElement.parentElement.dataset.todoId);
+        // alerter(event.target.parentElement.parentElement.dataset.todoId);
         // var data = JSON.parse(localData);
         data = data.filter(
           (element) =>
