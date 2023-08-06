@@ -1,8 +1,16 @@
 import { $container, createElement } from "./index";
-import { formatDistance, quartersToYears, subDays } from "date-fns";
+import {
+  daysToWeeks,
+  formatDistance,
+  formatDistanceStrict,
+  formatDistanceToNow,
+  parseISO,
+  quartersToYears,
+  subDays,
+} from "date-fns";
 import { alerter } from "./alerts";
 // import { data } from "./type";
-import { renderModal } from "./modal";
+import { renderModal, renderInitialModal } from "./modal";
 
 import EditIcon from "./icons/Edit.svg";
 import DeleteIcon from "./icons/delete.png";
@@ -11,29 +19,60 @@ import "./styles/mainContent.css";
 let localData = localStorage.getItem("data");
 localData = localData ? localData : "[]";
 let data = JSON.parse(localData);
-// data.splice(15, 1);
+// data.splice(0, 2);
 alerter(data);
-// let toInsert = {
-//   title: element.title,
-//   description: element.description,
-//   category: element.category,
-//   project: element.project,
-//   dueDate: element.dueDate,
-//   checklist: element.checklist,
-// };
-// data.push(toInsert);
 
 const newData = JSON.stringify(data);
 localStorage.setItem("data", newData);
 
-function renderData() {
+function renderData(filter) {
   // alerter(json);
 
+  if (filter == "all") {
+    localData = localStorage.getItem("data");
+    localData = localData ? localData : "[]";
+    data = JSON.parse(localData);
+  }
+  if (filter == "today") {
+    localData = localStorage.getItem("data");
+    localData = localData ? localData : "[]";
+    data = JSON.parse(localData);
+    data = data.filter((element) => {
+      const today = new Date();
+      const dueDate = parseISO(element.dueDate);
+      return (
+        dueDate.getDate() == today.getDate() &&
+        dueDate.getMonth() == today.getMonth() &&
+        dueDate.getFullYear() == today.getFullYear()
+      );
+    });
+  }
+  if (filter == "next7days") {
+    localData = localStorage.getItem("data");
+    localData = localData ? localData : "[]";
+    data = JSON.parse(localData);
+    data = data.filter((element) => {
+      const today = new Date();
+      const dueDate = parseISO(element.dueDate);
+      const next7days = subDays(today, -7);
+      return (
+        dueDate.getDate() <= next7days.getDate() &&
+        dueDate.getMonth() <= next7days.getMonth() &&
+        dueDate.getFullYear() <= next7days.getFullYear()
+      );
+    });
+  }
+  data = data.sort(function (a, b) {
+    // Turn your strings into dates, and then subtract them
+    // to get a value that is either negative, positive, or zero.
+    return new Date(a.dueDate) - new Date(b.dueDate);
+  });
+  document.querySelector(".todo").innerHTML = "";
   data.forEach((element) => renderElement(element));
 }
 
 function render() {
-  renderModal();
+  renderInitialModal();
 
   const target = $container.querySelector("#main");
   const $contentContainer = createElement(
@@ -45,6 +84,7 @@ function render() {
   const $content = createElement("div", "content", null, null);
   const $h2 = createElement("h2", null, null, "Category Name");
   const $optionsContainer = createElement("div", "todoContainer", null, null);
+  const $todo = createElement("div", null, ["todo"], null);
   const $actionBar = createElement("div", "actionBar", null, null);
   const $actionBarButtons = ["Add Task", "Add Project"];
   $actionBarButtons.forEach((element) => {
@@ -60,15 +100,22 @@ function render() {
   $optionsContainer.append($h2);
   $optionsContainer.append($actionBar);
 
-  $content.append($optionsContainer);
+  $content.append($optionsContainer, $todo);
   $contentContainer.append($content);
   target.append($contentContainer);
   // renderData();
 }
 function renderElement(element) {
   // alerter(element);
-  const target = $container.querySelector("#content");
+  const target = $container.querySelector(".todo");
   const $todo = createElement("div", null, ["todoChild"], null);
+  const $todoChildContent = createElement(
+    "div",
+    null,
+    ["todoChildContent"],
+    null
+  );
+  $todo.dataset.todoId = element.id;
   const $title = createElement(
     "h3",
     null,
@@ -93,11 +140,17 @@ function renderElement(element) {
     ["todoChildProj", "todoChildElement"],
     element.project
   );
+  // alerter(parseISO(element.dueDate));
+  const compareDate = parseISO(element.dueDate) - new Date();
+  if (compareDate < 0) {
+    $todo.classList.add("todoChildOverdue");
+  }
   const $dueDate = createElement(
     "p",
     null,
     ["todoChildDate", "todoChildElement"],
-    element.dueDate
+    (compareDate < 0 ? "Due by " : "In ") +
+      formatDistanceToNow(parseISO(element.dueDate))
   );
   const $priority = createElement(
     "p",
@@ -116,11 +169,26 @@ function renderElement(element) {
     $todoActions.append($todoActionsButton);
     $todoActionsButton.addEventListener("click", (event) => {
       if (event.target.dataset.todoActionsButton === "Edit") {
+        const modal = document.querySelector(".modal");
+        renderModal("editTask", event.target.parentElement.parentElement);
+        // alerter(event.target.parentElement.parentElement.dataset.todoId);
+        modal.showModal();
         alerter("Edit");
-        alerter(event.target.parentElement.parentElement.dataset);
       }
       if (event.target.dataset.todoActionsButton === "Delete") {
-        alerter("Delete");
+        alerter(event.target.parentElement.parentElement.dataset.todoId);
+        // var data = JSON.parse(localData);
+        data = data.filter(
+          (element) =>
+            element.id.toString() !==
+            event.target.parentElement.parentElement.dataset.todoId.toString()
+        );
+        alerter(data);
+        const newData = JSON.stringify(data);
+        localStorage.setItem("data", newData);
+        event.target.parentElement.parentElement.remove();
+
+        // alerter("Delete");
       }
     });
   });
@@ -141,13 +209,9 @@ function renderElement(element) {
   //   $checklistItem.append($checklistItemCheckbox);
   //   $checklist.append($checklistItem);
   // });
-  $todo.append($title);
+  $todoChildContent.append($title, $category, $project, $dueDate, $priority);
+  $todo.append($todoChildContent);
   // $todo.append($desc);
-
-  $todo.append($project);
-  $todo.append($category);
-  $todo.append($dueDate);
-  $todo.append($priority);
   $todo.append($todoActions);
   // $todo.append($checklist);
   target.append($todo);
@@ -156,8 +220,9 @@ function renderElement(element) {
 document.addEventListener("click", (event) => {
   if (event.target.dataset.actionBarButton === "Add Task") {
     const modal = document.querySelector(".modal");
+    renderModal("addTask");
     modal.showModal();
-    alerter("Add Task");
+    // alerter("Add Task");
   }
   if (event.target.dataset.actionBarButton === "Add Project") {
     alerter("Add Project");

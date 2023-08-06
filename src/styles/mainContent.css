@@ -8,6 +8,7 @@
   overflow-y: auto;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
   border-radius: 0.25rem;
+  container: content-container / inline-size;
 }
 .todoChild {
   display: flex;
@@ -15,9 +16,24 @@
   padding: 0.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
+.todoChildOverdue {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+.todoChildContent {
+  display: flex;
+  /* flex-direction: column; */
+  flex: 5;
+  /* gap: 0.5rem; */
+}
+.todoChildElement {
+  /* text-overflow: clip; */
+  /* word-wrap: break-word; */
+  text-align: center;
+}
 .todoChildTitle {
   flex: 2;
   font-weight: 500;
+  text-align: left;
 }
 .todoChildProj {
   flex: 1;
@@ -36,9 +52,10 @@
   font-weight: 400;
 }
 .todoActions {
-  flex: 1;
+  flex: 0.5;
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   align-items: center;
 }
 .todoActions img {
@@ -63,7 +80,7 @@
   justify-content: center;
   gap: 1rem;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
   /* border-bottom: 1px solid rgba(0, 0, 0, 0.2); */
 }
 .actionBarButton {
@@ -77,4 +94,23 @@
   font-weight: 500;
   font-size: 1rem;
   width: 7rem;
+}
+
+@media screen and (max-width: 450px) {
+  .todoChild {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  .todoChildTitle {
+    flex: 1;
+  }
+}
+@container (min-width: 450px) {
+  content-container > .todoChild {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  .todoChildTitle {
+    flex: 1;
+  }
 }

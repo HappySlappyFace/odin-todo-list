@@ -22,6 +22,7 @@ function displayMain() {
   const $main = createElement("div", "main", null, null);
   $container.append($main);
   createSidebar();
+  // closeNav();
   createMainContent();
   renderData();
 }
