@@ -1,6 +1,6 @@
 import { $container, createElement } from "./index";
 import { alerter } from "./alerts";
-import { renderElement } from "./mainContent";
+import { renderElement, renderData } from "./mainContent";
 import {
   daysToWeeks,
   formatDistance,
@@ -47,6 +47,32 @@ function render(type, nodeObject) {
     $dialogFormTitleInput.autocomplete = "off";
     $dialogFormTitleInput.autofocus = true;
     $dialogFormTitle.append($dialogFormTitleInput);
+
+    const $dialogFormProject = createElement(
+      "label",
+      null,
+      ["modalFormProject"],
+      "Project"
+    );
+    const $dialogFormProjectInput = createElement(
+      "select",
+      null,
+      ["modalFormProjectInput"],
+      null
+    );
+    $dialogFormProject.append($dialogFormProjectInput);
+    const projects = localStorage.getItem("projects").split(",");
+    projects.forEach((element) => {
+      const $dialogFormProjectOption = createElement(
+        "option",
+        null,
+        ["modalFormProjectOption"],
+        element
+      );
+      $dialogFormProjectOption.value = element;
+      $dialogFormProjectInput.append($dialogFormProjectOption);
+    });
+
     const $dialogFormDesc = createElement(
       "label",
       null,
@@ -77,7 +103,7 @@ function render(type, nodeObject) {
       ["modalFormDateInput"],
       null
     );
-    $dialogFormDateInput.type = "date";
+    $dialogFormDateInput.type = "datetime-local";
     $dialogFormDateInput.name = "date";
     $dialogFormDateInput.required = true;
     $dialogFormDateInput.placeholder = "Date";
@@ -141,6 +167,7 @@ function render(type, nodeObject) {
       const description = $dialogFormDescInput.value;
       const date = $dialogFormDateInput.value;
       const priority = $dialogFormPriorityInput.value;
+      const project = $dialogFormProjectInput.value;
       if (!title || !description || !date || !priority) {
         alert("Please fill all the fields");
         return;
@@ -155,11 +182,11 @@ function render(type, nodeObject) {
         title: title,
         description: description,
         category: "todo",
-        project: "default",
+        project: project,
         dueDate: date,
         priority: priority,
       };
-      console.log(toInsert);
+      // console.log(toInsert);
       data.push(toInsert);
       const newData = JSON.stringify(data);
       localStorage.setItem("data", newData);
@@ -172,7 +199,9 @@ function render(type, nodeObject) {
     $dialogForm.append(
       $dialogFormTitle,
       $dialogFormDesc,
+
       $dialogFormDate,
+      $dialogFormProject,
       $dialogFormPriority,
       $dialogFormSubmit
     );
@@ -180,6 +209,8 @@ function render(type, nodeObject) {
     $dialogBody.append($dialogHeader, $dialogForm);
     $dialog.append($dialogBody);
   }
+
+  // edit task
 
   if (type == "editTask") {
     let localData = localStorage.getItem("data");
@@ -192,7 +223,7 @@ function render(type, nodeObject) {
     const newData = JSON.stringify(data);
     localStorage.setItem("data", newData);
 
-    console.log(object);
+    // console.log(object);
 
     const $dialogHeader = createElement("div", null, ["modalHeader"], null);
     const $dialogTitle = createElement("h2", null, ["modalTitle"], "Add Task");
@@ -257,7 +288,7 @@ function render(type, nodeObject) {
       ["modalFormDateInput"],
       null
     );
-    $dialogFormDateInput.type = "date";
+    $dialogFormDateInput.type = "datetime-local";
     $dialogFormDateInput.name = "date";
     $dialogFormDateInput.required = true;
     $dialogFormDateInput.placeholder = "Due Date";
@@ -332,12 +363,12 @@ function render(type, nodeObject) {
         dueDate: date,
         priority: priority,
       };
-      console.log(toInsert);
+      // console.log(toInsert);
       const index = data.findIndex((item) => item.id == ID);
       data[index] = toInsert;
       const newData = JSON.stringify(data);
       localStorage.setItem("data", newData);
-      alerter(HTMLElement);
+      // alerter(HTMLElement);
       let ElementTitle = HTMLElement.querySelector(".todoChildTitle");
       ElementTitle.textContent = toInsert.title;
 
@@ -371,6 +402,81 @@ function render(type, nodeObject) {
       $dialogFormSubmit
     );
 
+    $dialogBody.append($dialogHeader, $dialogForm);
+    $dialog.append($dialogBody);
+  }
+
+  // empty space
+
+  if (type == "addProject") {
+    const projects = localStorage.getItem("projects").split(",");
+
+    const $dialogHeader = createElement("div", null, ["modalHeader"], null);
+    const $dialogTitle = createElement(
+      "h2",
+      null,
+      ["modalTitle"],
+      "Add Project"
+    );
+    const $dialogClose = createElement("button", null, ["modalClose"], "X");
+    document.addEventListener("click", (e) => {
+      if (e.target.matches(".modalClose")) {
+        $dialog.close();
+        $dialog.innerHTML = "";
+      }
+    });
+    $dialogHeader.append($dialogTitle, $dialogClose);
+    const $dialogBody = createElement("div", null, ["modalBody"], null);
+    const $dialogForm = createElement("form", null, ["modalForm"], null);
+    const $dialogFormTitle = createElement(
+      "label",
+      null,
+      ["modalFormTitle"],
+      "Title"
+    );
+    const $dialogFormTitleInput = createElement(
+      "input",
+      null,
+      ["modalFormTitleInput"],
+      null
+    );
+    $dialogFormTitleInput.type = "text";
+    $dialogFormTitleInput.name = "title";
+    $dialogFormTitleInput.required = true;
+    $dialogFormTitleInput.placeholder = "Title";
+    $dialogFormTitleInput.autocomplete = "off";
+
+    const $dialogFormSubmit = createElement(
+      "button",
+      null,
+      ["modalFormSubmit"],
+      "Submit"
+    );
+    $dialogFormSubmit.type = "submit";
+    $dialogFormSubmit.addEventListener("click", (e) => {
+      e.preventDefault();
+      const title = $dialogFormTitleInput.value;
+      if (title == "") {
+        alert("Please enter a title");
+        return;
+      }
+      projects.push(title);
+      localStorage.setItem("projects", projects);
+      const $projectList = document
+        .querySelector("#secondCategory")
+        .querySelector("ul");
+      const $project = createElement("li", null, ["secondCategoryItem"], null);
+      $project.dataset.secondCategoryItem = title;
+      $project.textContent = title;
+      $project.addEventListener("click", () => {
+        renderData(title);
+      });
+      $projectList.append($project);
+      $dialog.close();
+      $dialog.innerHTML = "";
+    });
+    $dialogFormTitle.append($dialogFormTitleInput);
+    $dialogForm.append($dialogFormTitle, $dialogFormSubmit);
     $dialogBody.append($dialogHeader, $dialogForm);
     $dialog.append($dialogBody);
   }

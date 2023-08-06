@@ -17,16 +17,19 @@ function createElement(tag, idName, classNames, text) {
   if (text) $element.textContent = text;
   return $element;
 }
-
+var sidebarStatus = true;
 function displayMain() {
   const $main = createElement("div", "main", null, null);
   $container.append($main);
   createSidebar();
-  // closeNav();
   createMainContent();
   renderData();
+  if (navigator.userAgent.match(/Android/i) == "Android") {
+    closeNav();
+    sidebarStatus = false;
+  }
 }
-var sidebarStatus = true;
+
 document.addEventListener("click", (event) => {
   if (event.target.dataset.headerItem === "burger") {
     if (!sidebarStatus) {
@@ -40,9 +43,12 @@ document.addEventListener("click", (event) => {
 
   if (event.target.dataset.headerItem === "home") {
     console.log("goto home");
+
+    window.open("https://github.com/HappySlappyFace", "_blank");
   }
   if (event.target.dataset.headerItem === "progress") {
     console.log("show progress");
+    alert("Pretend this is a progress bar");
   }
 });
 

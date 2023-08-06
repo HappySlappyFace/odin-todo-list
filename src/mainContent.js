@@ -13,30 +13,46 @@ import { alerter } from "./alerts";
 import { renderModal, renderInitialModal } from "./modal";
 
 import EditIcon from "./icons/Edit.svg";
-import DeleteIcon from "./icons/delete.png";
+import DeleteIcon from "./icons/delete.svg";
 import "./styles/mainContent.css";
+import { is } from "date-fns/locale";
 
 let localData = localStorage.getItem("data");
 localData = localData ? localData : "[]";
 let data = JSON.parse(localData);
 // data.splice(0, 2);
-alerter(data);
+// alerter(data);
 
 const newData = JSON.stringify(data);
 localStorage.setItem("data", newData);
 
+let projects = localStorage.getItem("projects");
+projects = projects ? projects.split(",") : ["Default"];
+localStorage.setItem("projects", projects);
+
 function renderData(filter) {
   // alerter(json);
+  const $containerTitle = document.querySelector(".containerTitle");
 
-  if (filter == "all") {
+  const projects = localStorage.getItem("projects").split(",");
+  if (projects.includes(filter)) {
     localData = localStorage.getItem("data");
     localData = localData ? localData : "[]";
     data = JSON.parse(localData);
-  }
-  if (filter == "today") {
+    $containerTitle.textContent = filter;
+    data = data.filter((element) => {
+      return element.project == filter;
+    });
+  } else if (filter == "all") {
     localData = localStorage.getItem("data");
     localData = localData ? localData : "[]";
     data = JSON.parse(localData);
+    $containerTitle.textContent = "All tasks";
+  } else if (filter == "today") {
+    localData = localStorage.getItem("data");
+    localData = localData ? localData : "[]";
+    data = JSON.parse(localData);
+    $containerTitle.textContent = "Today's tasks";
     data = data.filter((element) => {
       const today = new Date();
       const dueDate = parseISO(element.dueDate);
@@ -46,11 +62,11 @@ function renderData(filter) {
         dueDate.getFullYear() == today.getFullYear()
       );
     });
-  }
-  if (filter == "next7days") {
+  } else if (filter == "next7days") {
     localData = localStorage.getItem("data");
     localData = localData ? localData : "[]";
     data = JSON.parse(localData);
+    $containerTitle.textContent = "Next 7 days";
     data = data.filter((element) => {
       const today = new Date();
       const dueDate = parseISO(element.dueDate);
@@ -82,7 +98,7 @@ function render() {
     null
   );
   const $content = createElement("div", "content", null, null);
-  const $h2 = createElement("h2", null, null, "Category Name");
+  const $h2 = createElement("h2", null, ["containerTitle"], "Category Name");
   const $optionsContainer = createElement("div", "todoContainer", null, null);
   const $todo = createElement("div", null, ["todo"], null);
   const $actionBar = createElement("div", "actionBar", null, null);
@@ -173,7 +189,7 @@ function renderElement(element) {
         renderModal("editTask", event.target.parentElement.parentElement);
         // alerter(event.target.parentElement.parentElement.dataset.todoId);
         modal.showModal();
-        alerter("Edit");
+        // alerter("Edit");
       }
       if (event.target.dataset.todoActionsButton === "Delete") {
         alerter(event.target.parentElement.parentElement.dataset.todoId);
@@ -183,7 +199,7 @@ function renderElement(element) {
             element.id.toString() !==
             event.target.parentElement.parentElement.dataset.todoId.toString()
         );
-        alerter(data);
+        // alerter(data);
         const newData = JSON.stringify(data);
         localStorage.setItem("data", newData);
         event.target.parentElement.parentElement.remove();
@@ -225,7 +241,10 @@ document.addEventListener("click", (event) => {
     // alerter("Add Task");
   }
   if (event.target.dataset.actionBarButton === "Add Project") {
-    alerter("Add Project");
+    const modal = document.querySelector(".modal");
+    renderModal("addProject");
+    modal.showModal();
+    // alerter("Add Project");
   }
 });
 export { render as createMainContent, renderData, renderElement };

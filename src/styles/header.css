@@ -14,6 +14,8 @@
   font-size: 1rem;
   margin: 0;
   text-align: center;
+  font-family: "poppins", sans-serif;
+  font-weight: 500;
 }
 .headerGroup {
   display: flex;

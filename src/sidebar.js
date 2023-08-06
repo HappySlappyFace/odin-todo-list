@@ -21,7 +21,7 @@ function render() {
   const $secondCategory = createElement("div", "secondCategory", null, null);
   const $secondCategoryTitle = createElement("h2", null, null, "Projects");
   const $secondCategoryList = createElement("ul", null, null, null);
-  const $secondCategoryListItems = ["All Projects", "Fitness", "Finance"]; //this will be fetched from database
+  const $secondCategoryListItems = localStorage.getItem("projects").split(",");
   $secondCategoryListItems.forEach((element) => {
     const $secondCategoryListItem = createElement(
       "li",
@@ -30,6 +30,9 @@ function render() {
       element
     );
     $secondCategoryListItem.dataset.secondCategoryItem = element;
+    $secondCategoryListItem.addEventListener("click", () => {
+      renderData(element);
+    });
     $secondCategoryList.append($secondCategoryListItem);
   });
   $secondCategory.append($secondCategoryTitle, $secondCategoryList);
@@ -59,9 +62,6 @@ document.addEventListener("click", (event) => {
   if (event.target.dataset.mainCategoryItem === "Next 7 Days") {
     // console.log("goto next 7 days");
     renderData("next7days");
-  }
-  if (event.target.dataset.secondCategoryItem === "All Tasks") {
-    console.log("second category");
   }
 });
 export { render as createSidebar, openNav, closeNav };
